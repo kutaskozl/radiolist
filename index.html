@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://kit-pro.fontawesome.com/releases/v6.1.1/css/pro.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+    <title>oskar_radioHud</title>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span id="Frequency">Radio: 0</span>
+            <span id="Active">Osoby: 0</span>
+        </div>
+        <div id="PersonList">
+        </div>
+    </div>
+</body>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
+    body {
+        margin: 100px 60% 24px 40%;
+        padding: 0;
+        background-color: transparent;
+        font-weight: 600;
+        font-family: 'Roboto Condensed';
+        font-size: 15px;
+        color: white;
+    }
+    .container {
+        position: absolute;
+        padding: 1vh;
+        border-radius: 1vh;
+        right: 87.5%;
+        top: 40%;
+        width: 12.5rem;
+        background-color: rgba(24, 24, 24, .8);
+        border: 2px solid #8a2be2;
+    }
+    #Active, #Frequency {
+        color: #ccc;
+    }
+    .Badge, .User {
+        color: white;
+    }
+    #Active, .Badge {
+        float: right;
+        margin-right: 5px;
+    }
+    .User {
+        margin-top: 1vh;
+    }
+    #Talking {
+        color: #4DABF7;
+    }
+</style>
+<script>
+    window.addEventListener("message", (event) => {
+        switch(event.data.type) {
+            case 'ShowUI':
+                $(".container").fadeIn(150);
+                setTimeout(() => {
+                    $(".container").show();
+                }, 150);
+                document.getElementById("Frequency").textContent = 'Radio: '+event.data.channel;
+                document.getElementById("Active").textContent = 'Osoby: '+event.data.count;
+                UpdateList(event.data.players);
+                break;
+            case 'HideUI':
+                $(".container").fadeOut(150);
+                setTimeout(() => {
+                    $(".container").hide();
+                }, 150);
+        }
+
+        function UpdateList(players) {
+            let PlayerList = '';
+            for (let i in players) {
+                let data = players[i];
+                let name = data.player;
+                let badge = data.badge;
+                let talking = data.isTalking;
+                if (talking == true) {
+                    if(badge == '' || badge == undefined) {
+                        PlayerList = PlayerList + '<div class="User" id="Talking"><span id="Name">'+name+'</span></div>'
+                    } else {
+                        PlayerList = PlayerList + '<div class="User" id="Talking"><span id="Name">'+name+'</span><span class="Badge" id="Talking">['+badge+']</span></div>'
+                    }
+                } else {
+                    if(badge == '' || badge == undefined) {
+                        PlayerList = PlayerList + '<div class="User" id=""><span id="Name">'+name+'</span></div>'
+                    } else {
+                        PlayerList = PlayerList + '<div class="User" id=""><span id="Name">'+name+'</span><span class="Badge">['+badge+']</span></div>'
+                    }
+                }
+            }
+            this.document.getElementById("PersonList").innerHTML = PlayerList;
+            return
+        }
+    })
+</script>
+</html>
